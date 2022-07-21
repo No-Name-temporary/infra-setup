@@ -1,0 +1,21 @@
+{
+  "name": "testresultwriter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "locally": "node -e \"console.log(require('./index').handler(require('./event.json')));\"",
+    "zip": "zip -r test-result-writer-v1.zip .",
+    "lint": "./node_modules/.bin/eslint ."
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.0.1",
+    "pg": "^8.7.3"
+  },
+  "devDependencies": {
+    "eslint": "^8.19.0",
+    "eslint-config-airbnb": "^19.0.4"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "Records": [
+    {
+      "messageId": "13653b34-afaa-4fcf-bd6e-3e890ce2534b",
+      "receiptHandle": "AQEBDWQMq/xBhw5InM6yP8Q4JMfbUTOuQFl4+EXBF2jhMp2vI59w7U8E/2Mq1FBSVMgGa2sfvOqvwBaKnReXYWaxRoIhUIHvc9vyexiiXYXCX5674TRjmT9ZoivF4PcdH1k8d+tzjpzXfzaib31jYOXyICnEfrWHYvpK3wC0HssaA/TU9gMIbphgWshnNzcDmAgKiBAbHbs/9BRUFuOFSs+3LS4wxZAPRTAhqB+OzrI6SMp5uGZynU6ntxuQ8caxtSWufe3kezhEN+w+JvB9B+5kKCHjFvOcFiMnGcxObxJUX/qkGf7gfTAmvux7a4TnZhJH6iTCwByenwNNmTV6s9fHTnExfbXwhkm1WGC8k8K8wjcetKnhgW8Psc+fF1IOfIjDSf2EDKHtLAXTIx9ecukFlg==",
+      "body": "{\"title\":\"end2end-test03-test\",\"sender\":\"ca-central-1\",\"timestamp\":\"Sat, 16 Jul 2022 17:54:22 GMT\",\"results\":[{\"assertionType\":\"statusCode\",\"targetValue\":\"200\",\"actualValue\":201,\"comparisonType\":\"equal_to\",\"success\":false}]}",
+      "attributes": {},
+      "messageAttributes": {},
+      "md5OfBody": "ac46e56dba2916edb40720fa89e69ae8",
+      "eventSource": "aws:sqs",
+      "eventSourceARN": "arn:aws:sqs:us-east-1:082057163641:test-result-collector-Q",
+      "awsRegion": "us-east-1"
+    }
+  ]
+}

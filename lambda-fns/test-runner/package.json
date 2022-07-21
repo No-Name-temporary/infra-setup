@@ -1,0 +1,29 @@
+{
+  "name": "testrunner-california",
+  "version": "1.0.0",
+  "description": "Contains code and libraries for test runner Lambda",
+  "main": "index.js",
+  "scripts": {
+    "locally": "node -e \"console.log(require('./index').handler(require('./event.json')));\"",
+    "zip": "zip -r test-runner-sqs.zip .",
+    "lint": "./node_modules/.bin/eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/No-Name-temporary/lambdas.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/No-Name-temporary/lambdas/issues"
+  },
+  "homepage": "https://github.com/No-Name-temporary/lambdas#readme",
+  "dependencies": {
+    "@aws-sdk/client-sqs": "^3.131.0",
+    "axios": "^0.27.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.19.0",
+    "eslint-config-airbnb": "^19.0.4"
+  }
+}
