@@ -9,13 +9,21 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import { SqsEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
 import { Duration } from 'aws-cdk-lib';
 import { SqsSubscription } from 'aws-cdk-lib/aws-sns-subscriptions';
+import { ITopic } from 'aws-cdk-lib/aws-sns';
 
 
-export class ProvisionAwsStack extends cdk.Stack {
+export class HomeRegionStack extends cdk.Stack {
+
+  public testMsgFanOut: ITopic;
+
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const { ACCOUNT, HOME_REGION } = process.env;
+    const accountId = cdk.Stack.of(this).account;
+    const currRegion = cdk.Stack.of(this).region;
+    console.log("Home Region // accountId: ", accountId, "currRegion: ", currRegion);
+
+    const { HOME_REGION } = process.env;
     const appName = 'tests-crud';
     
     // EBS IAM Roles
@@ -55,11 +63,12 @@ export class ProvisionAwsStack extends cdk.Stack {
       }
     ];
 
-    // EBS Application and Environment
+    // ElasticBeanstalk Application
     const app = new eb.CfnApplication(this, 'Application', {
       applicationName: `${appName}-EB-App`
     });
 
+    // ElasticBeanstalk App Environment
     const env = new eb.CfnEnvironment(this, 'Environment', {
       environmentName: `${appName}-EB-Env`,
       applicationName: `${appName}-EB-App`,
@@ -78,10 +87,20 @@ export class ProvisionAwsStack extends cdk.Stack {
       retentionPeriod: Duration.minutes(5)
     });
 
-    const testMsgFanOut = new sns.Topic(this, 'test-msg-fan-out');
+    // Queue to recieve the SNS message, emptied by `test-runner` in home region
+    const testResultCollectorQ = new sqs.Queue(this, 'test-result-collector-Q', {
+      visibilityTimeout: Duration.minutes(4),
+      queueName: 'test-result-collector-Q',
+      retentionPeriod: Duration.minutes(5)
+    });
+
+    this.testMsgFanOut = new sns.Topic(this, 'test-msg-fan-out', {
+      topicName: 'test-msg-fan-out'
+    });
+    // this.msgFanOutSNSArn = testMsgFanOut.topicArn;
 
     // Home region queue for test-runner subscribe and only rcv applicable msgs
-    testMsgFanOut.addSubscription(new SqsSubscription(remoteRcvQ, {
+    this.testMsgFanOut.addSubscription(new SqsSubscription(remoteRcvQ, {
       rawMessageDelivery: false,
       filterPolicy: {
         location: sns.SubscriptionFilter.stringFilter({
@@ -90,26 +109,49 @@ export class ProvisionAwsStack extends cdk.Stack {
       }
     }));
 
-
+    // Lambda to add MessageAttributes for SNS routing
     const testRoutePackagerLambda = new lambda.Function(this, 'test-route-packager', {
       functionName: 'test-route-packager',
       runtime: lambda.Runtime.NODEJS_16_X,
       code: lambda.Code.fromAsset('lambda-fns/test-route-packager'),
       handler: 'index.handler',
-      onSuccess: new cdk.aws_lambda_destinations.SnsDestination(testMsgFanOut),
+      onSuccess: new cdk.aws_lambda_destinations.SnsDestination(this.testMsgFanOut),
     });
 
-    testMsgFanOut.grantPublish(testRoutePackagerLambda);
+    // SNS permits the packager Lambda to publish a msg to a topic
+    this.testMsgFanOut.grantPublish(testRoutePackagerLambda);
 
+    // Lambda to run actual HTTP tests and send on the results
     const testRunnerLambda = new lambda.Function(this, 'test-runner', {
       functionName: 'test-runner',
       runtime: lambda.Runtime.NODEJS_16_X,
       code: lambda.Code.fromAsset('lambda-fns/test-runner'),
       handler: 'index.handler',
+      onSuccess: new cdk.aws_lambda_destinations.SqsDestination(testResultCollectorQ),
     });
 
+    // SQS in front of test-runner, allow Lambda read+delete msgs
     remoteRcvQ.grantConsumeMessages(testRunnerLambda);
+
+    // Lambda set to be triggered by remote-rcv SQS receiving a message
     testRunnerLambda.addEventSource(new SqsEventSource(remoteRcvQ, {
+      batchSize: 1,
+      enabled: true
+    }));
+
+    // Lambda to process test results and write them to DB
+    const testResultWriterLambda = new lambda.Function(this, 'test-result-writer', {
+      functionName: 'test-result-writer',
+      runtime: lambda.Runtime.NODEJS_16_X,
+      code: lambda.Code.fromAsset('lambda-fns/test-result-writer'),
+      handler: 'index.handler',
+    });
+
+    // SQS for collecting test results, allow Lambda read+delete msgs
+    testResultCollectorQ.grantConsumeMessages(testResultWriterLambda);
+
+    // Lambda set to be triggered by test-collector SQS receiving a msg
+    testResultWriterLambda.addEventSource(new SqsEventSource(testResultCollectorQ, {
       batchSize: 1,
       enabled: true
     }));
