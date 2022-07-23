@@ -5,7 +5,7 @@ const getTimestamp = require('./entities/timestamp');
 
 exports.handler = async (event) => {
   const body = JSON.parse(event.Records[0].body);
-  const currRegion = event.Records[0].awsRegion;
+  const currRegion = process.env.AWS_REGION;
   const { test } = JSON.parse(body.Message);
 
   console.log(`...starting test runner in ${currRegion}...`);

@@ -8,17 +8,17 @@ import { Duration } from 'aws-cdk-lib';
 import { ITopic } from 'aws-cdk-lib/aws-sns';
 
 
-interface HomeStackProps extends cdk.StackProps {
+interface RemoteStackProps extends cdk.StackProps {
   testMsgFanOut: ITopic,
+  resultCollectorQUrl?: string,
 }
 
 export class RemoteRegionStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props: HomeStackProps) {
+  constructor(scope: Construct, id: string, props: RemoteStackProps) {
     super(scope, id, props);
 
-    const accountId = cdk.Stack.of(this).account;
     const currRegion = cdk.Stack.of(this).region;
-    console.log("Remote Region // accountId: ", accountId, "currRegion: ", currRegion);
+    console.log("remoteRegion: ", currRegion);
 
     const remoteRcvQ = new sqs.Queue(this, 'remote-recv-Q', {
       visibilityTimeout: Duration.minutes(4),
@@ -34,12 +34,18 @@ export class RemoteRegionStack extends cdk.Stack {
       protocol: "sqs",
       rawMessageDelivery: false,
       region: "us-east-1"
-  });
+    });
 
     const testRunnerLambda = new lambda.Function(this, 'test-runner', {
+      functionName: 'test-runner',
       runtime: lambda.Runtime.NODEJS_16_X,
       code: lambda.Code.fromAsset('lambda-fns/test-runner'),
       handler: 'index.handler',
+      timeout: cdk.Duration.seconds(20),
+      // environment: {
+      //   RESULTS_Q_URL: props.resultCollectorQUrl,
+      // }
+      // onSuccess: new cdk.aws_lambda_destinations.SqsDestination(props.testResultCollectorQ),
     });
 
     remoteRcvQ.grantConsumeMessages(testRunnerLambda);
