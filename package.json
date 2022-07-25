@@ -5,6 +5,7 @@
     "provision-aws": "bin/provision-aws.js"
   },
   "scripts": {
+    "provision": "cdk deploy --all --require-approval never --outputs-file config.json",
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest",

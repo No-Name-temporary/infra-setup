@@ -44,5 +44,10 @@ export class FrontendStack extends cdk.Stack {
         sources: [cdk.aws_s3_deployment.Source.asset('../frontend')],
         destinationBucket: this.frontendS3Bucket
     })
+
+    // Output the URL endpoint at which to access the frontend
+    new cdk.CfnOutput(this, 'frontendWebsiteUrl', {
+      value: this.frontendS3Bucket.bucketWebsiteUrl,
+    });
   }
 }

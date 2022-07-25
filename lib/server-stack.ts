@@ -136,6 +136,7 @@ export class ServerStack extends cdk.Stack {
       versionLabel: appVersionProps.ref,
     });
 
+    appVersionProps.addDependsOn(app);
     env.addDependsOn(app);
 
     // Output the URL endpoint at which to access tests-crud app
