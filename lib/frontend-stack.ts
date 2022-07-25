@@ -15,7 +15,7 @@ export class FrontendStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
       publicReadAccess: true,
-      websiteIndexDocument: "index.html",
+      websiteIndexDocument: 'index.html',
       blockPublicAccess: new s3.BlockPublicAccess({ restrictPublicBuckets: false })
     });
 
@@ -30,18 +30,18 @@ export class FrontendStack extends cdk.Stack {
     );
 
     // Allow lambda service to add objects to the frontend s3 bucket
-    this.frontendS3Bucket.policy?.document.addStatements(
-      new iam.PolicyStatement({
-        effect: iam.Effect.ALLOW,
-        principals: [new iam.ServicePrincipal('lambda.amazonaws.com')],
-        actions: ['s3:PutObject'],
-        resources: [this.frontendS3Bucket.bucketArn],
-      }),
-    );
+    // this.frontendS3Bucket.policy?.document.addStatements(
+    //   new iam.PolicyStatement({
+    //     effect: iam.Effect.ALLOW,
+    //     principals: [new iam.ServicePrincipal('lambda.amazonaws.com')],
+    //     actions: ['s3:PutObject'],
+    //     resources: [this.frontendS3Bucket.bucketArn],
+    //   }),
+    // );
     
     const deployment = new cdk.aws_s3_deployment.
       BucketDeployment(this, 'deploy-frontend-bucket', {
-        sources: [cdk.aws_s3_deployment.Source.asset('../frontend')],
+        sources: [cdk.aws_s3_deployment.Source.asset('../provision-aws/frontend')],
         destinationBucket: this.frontendS3Bucket
     })
 
