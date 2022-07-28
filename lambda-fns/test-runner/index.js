@@ -22,5 +22,5 @@ exports.handler = async (event) => {
     results,
   };
 
-  sendMsgToSQS(response);
+  await sendMsgToSQS(response);
 };

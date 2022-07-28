@@ -1,13 +1,14 @@
 {
-  "HomeRegionStack": {
-    "ExportsOutputFnGetAtttestroutepackagerBC3E328EArn90EFD4EB": "arn:aws:lambda:us-east-1:026391791342:function:test-route-packager",
-    "ExportsOutputFnGetAttroutepackagerurlfunc54EAB039FunctionUrl323759EE": "https://ri2te2gy7prpiilxtkhlnn37yq0czqwi.lambda-url.us-east-1.on.aws/"
-  },
   "SeymourDB": {
-    "ExportsOutputFnGetAttPostgres9DC8BB04EndpointAddress36F9722A": "sp11k5zwdb5tf0i.cwfwsjd5clwi.us-east-1.rds.amazonaws.com",
-    "postgresDbEndpoint": "sp11k5zwdb5tf0i.cwfwsjd5clwi.us-east-1.rds.amazonaws.com"
+    "RdsInitFnResponse": "{\"status\":\"OK\",\"results\":\"[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object \"}",
+    "ExportsOutputFnGetAttPostgres9DC8BB04EndpointAddress36F9722A": "sptz335636u0fp.cwfwsjd5clwi.us-east-1.rds.amazonaws.com",
+    "postgresDbEndpoint": "sptz335636u0fp.cwfwsjd5clwi.us-east-1.rds.amazonaws.com"
   },
-  "HomeRegionStacktestscrud6F27ADE2": {
-    "testsCrudEndpointUrl": "awseb-e-y-AWSEBLoa-Z6NACM94WB3X-632444285.us-east-1.elb.amazonaws.com"
+  "HomeRegionStack": {
+    "testscrudtestsCrudEndpointUrlAE5F8964": "awseb-e-q-AWSEBLoa-1P0T6MQSJWMTW-1175063008.us-east-1.elb.amazonaws.com"
+  },
+  "FrontendStack": {
+    "backendServerEndpoint": "awseb-e-q-AWSEBLoa-1P0T6MQSJWMTW-1175063008.us-east-1.elb.amazonaws.com",
+    "frontendWebsiteUrl": "http://seymour-react-temp-frontend-bucket.s3-website-us-east-1.amazonaws.com"
   }
 }
