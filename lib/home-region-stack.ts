@@ -5,30 +5,26 @@ import * as sqs from 'aws-cdk-lib/aws-sqs';
 import * as sns from 'aws-cdk-lib/aws-sns';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as rds from 'aws-cdk-lib/aws-rds';
+import * as ssm from 'aws-cdk-lib/aws-ssm';
 import { SqsEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
 import { Duration } from 'aws-cdk-lib';
 import { SqsSubscription } from 'aws-cdk-lib/aws-sns-subscriptions';
 import { ITopic } from 'aws-cdk-lib/aws-sns';
-import { IQueue } from 'aws-cdk-lib/aws-sqs';
-import { ServerStack } from './server-stack';
+import { ServerApp } from './server-construct';
 
 
 interface HomeStackProps extends cdk.StackProps {
-  pgInstance: rds.DatabaseInstance;
+  pgInstance: rds.DatabaseInstance
 }
 
 export class HomeRegionStack extends cdk.Stack {
   public testMsgFanOut: ITopic;
-  public testResultCollectorQ: IQueue;
-  public env: cdk.Stack;
 
   constructor(scope: Construct, id: string, props: HomeStackProps) {
     super(scope, id, props);
+  
 
     const homeRegion = cdk.Stack.of(this).region;
-    const account = cdk.Stack.of(this).account;
-    console.log("homeRegion: ", homeRegion);
-
 
     // Queue to recieve the SNS message, emptied by `test-runner` in home region
     const remoteRcvQ = new sqs.Queue(this, 'remote-recv-Q', {
@@ -38,22 +34,27 @@ export class HomeRegionStack extends cdk.Stack {
     });
 
     // Queue to recieve the SNS message, emptied by `test-runner` in home region
-    this.testResultCollectorQ = new sqs.Queue(this, 'test-result-collector-Q', {
+    const testResultCollectorQ = new sqs.Queue(this, 'test-result-collector-Q', {
       visibilityTimeout: Duration.minutes(4),
       queueName: 'test-result-collector-Q',
       retentionPeriod: Duration.minutes(5)
     });
 
+    // create SSM parameter to store the Queue URL for test-result-collector-Q
+    new ssm.StringParameter(this, 'resultCollectorQUrl', {
+      parameterName: `resultCollectorQUrl`,
+      stringValue: testResultCollectorQ.queueUrl
+    })
+
     this.testMsgFanOut = new sns.Topic(this, 'test-msg-fan-out', {
       topicName: 'test-msg-fan-out'
     });
-    // this.msgFanOutSNSArn = testMsgFanOut.topicArn;
 
     // Home region queue for test-runner subscribe and only rcv applicable msgs
     this.testMsgFanOut.addSubscription(new SqsSubscription(remoteRcvQ, {
       rawMessageDelivery: false,
       filterPolicy: {
-        location: sns.SubscriptionFilter.stringFilter({
+        locations: sns.SubscriptionFilter.stringFilter({
           allowlist: [`${homeRegion}`]
         })
       }
@@ -65,6 +66,9 @@ export class HomeRegionStack extends cdk.Stack {
       runtime: lambda.Runtime.NODEJS_16_X,
       code: lambda.Code.fromAsset('lambda-fns/test-route-packager'),
       handler: 'index.handler',
+      environment: {
+        TOPIC_ARN: this.testMsgFanOut.topicArn
+      },
       onSuccess: new cdk.aws_lambda_destinations.SnsDestination(this.testMsgFanOut),
     });
 
@@ -73,14 +77,13 @@ export class HomeRegionStack extends cdk.Stack {
       function: testRoutePackagerLambda
     });
 
-    const serverStack = new ServerStack(this, 'tests-crud', {
-      env: { account, region: homeRegion }, 
-      pgInstance: props.pgInstance,
-      testRoutePackagerUrl: testRoutePackagerUrlFunc.url,
-    });
+    const serverApp = new ServerApp(this, 'tests-crud', {
+        pgInstance: props.pgInstance,
+        testRoutePackagerUrl: testRoutePackagerUrlFunc.url,
+        testRoutePackagerLambda
+      });
 
-    testRoutePackagerUrlFunc.grantInvokeUrl(serverStack.ebInstanceRole);
-  
+    testRoutePackagerUrlFunc.grantInvokeUrl(serverApp.ebInstanceRole);
 
     // SNS permits the packager Lambda to publish a msg to a topic
     this.testMsgFanOut.grantPublish(testRoutePackagerLambda);
@@ -92,7 +95,7 @@ export class HomeRegionStack extends cdk.Stack {
       code: lambda.Code.fromAsset('lambda-fns/test-runner'),
       handler: 'index.handler',
       timeout: cdk.Duration.seconds(20),
-      onSuccess: new cdk.aws_lambda_destinations.SqsDestination(this.testResultCollectorQ),
+      onSuccess: new cdk.aws_lambda_destinations.SqsDestination(testResultCollectorQ),
     });
 
     // SQS in front of test-runner, allow Lambda read+delete msgs
@@ -114,10 +117,10 @@ export class HomeRegionStack extends cdk.Stack {
     });
 
     // SQS for collecting test results, allow Lambda read+delete msgs
-    this.testResultCollectorQ.grantConsumeMessages(testResultWriterLambda);
+    testResultCollectorQ.grantConsumeMessages(testResultWriterLambda);
 
     // Lambda set to be triggered by test-collector SQS receiving a msg
-    testResultWriterLambda.addEventSource(new SqsEventSource(this.testResultCollectorQ, {
+    testResultWriterLambda.addEventSource(new SqsEventSource(testResultCollectorQ, {
       batchSize: 1,
       enabled: true
     }));

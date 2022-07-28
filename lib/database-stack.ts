@@ -2,10 +2,11 @@ import 'dotenv/config';
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as rds from 'aws-cdk-lib/aws-rds';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
 import { Duration, Token } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { CdkResourceInitializer } from './resource-init-rds';
-import { DockerImageCode } from 'aws-cdk-lib/aws-lambda';
+// import { DockerImageCode } from 'aws-cdk-lib/aws-lambda';
 import { RetentionDays } from 'aws-cdk-lib/aws-logs';
 
 
@@ -64,15 +65,16 @@ export class DatabaseStack extends cdk.Stack {
     const initializer = new CdkResourceInitializer(this, 'SeymourRdsInit', {
       config: {  password: password.unsafeUnwrap(), host, dbPort, username, dbName },
       fnLogRetention: RetentionDays.ONE_WEEK,
-      fnCode: DockerImageCode.fromImageAsset(`${__dirname}/init-rds`, {}),
+      fnCode: lambda.Code.fromAsset('lambda-fns/init-rds'),
       fnTimeout: Duration.minutes(3),
       fnSecurityGroups: [],
+      allowPublicSubnet: true,
       vpc: this.vpc,
       subnetsSelection: this.vpc.selectSubnets({
         subnetType: ec2.SubnetType.PUBLIC
       })
     })
-    
+
     // manage resources dependency
     initializer.customResource.node.addDependency(this.pgInstance)
 

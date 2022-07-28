@@ -1,6 +1,6 @@
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
-import { Duration, Stack } from 'aws-cdk-lib';
+import { aws_lambda, Duration, Stack } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { AwsCustomResource, 
          AwsCustomResourcePolicy, 
@@ -14,8 +14,9 @@ export interface CdkResourceInitializerProps {
   vpc: ec2.IVpc
   subnetsSelection: ec2.SubnetSelection
   fnSecurityGroups: ec2.ISecurityGroup[]
+  allowPublicSubnet: boolean
   fnTimeout: Duration
-  fnCode: lambda.DockerImageCode
+  fnCode: aws_lambda.Code
   fnLogRetention: RetentionDays
   fnMemorySize?: number
   config: any
@@ -37,12 +38,15 @@ export class CdkResourceInitializer extends Construct {
       allowAllOutbound: true
     })
 
-    const fn = new lambda.DockerImageFunction(this, 'ResourceInitializerFn', {
+    const fn = new lambda.Function(this, 'RdsInitializerFn', {
       memorySize: props.fnMemorySize || 128,
       functionName: `${id}-ResInit${stack.stackName}`,
+      runtime: lambda.Runtime.NODEJS_16_X,
       code: props.fnCode,
+      handler: 'index.handler',
       vpcSubnets: props.vpc.selectSubnets(props.subnetsSelection),
       vpc: props.vpc,
+      allowPublicSubnet: props.allowPublicSubnet,
       securityGroups: [fnSg, ...props.fnSecurityGroups],
       timeout: props.fnTimeout,
       logRetention: props.fnLogRetention,

@@ -21,13 +21,13 @@ exports.handler = async (e) => {
 
     return {
       status: 'OK',
-      results: res
+      results: String(res).substring(0,200)
     }
   } catch (err) {
     return {
       status: 'ERROR',
       err,
-      message: err.message
+      message: err.message.substring(0,200)
     }
   }
 }
