@@ -12,17 +12,14 @@ async function sendMsgToSQS(response) {
   };
 
   console.log('final params --> ', params);
-
-  const run = async () => {
-    try {
-      const data = await sqsClient.send(new SendMessageCommand(params));
-      console.log(`Success, message sent to ${params.QueueUrl}. MessageID:`, data.MessageId);
-      return data;
-    } catch (err) {
-      console.log('Error', err);
-    }
-  };
-  run();
+  
+  try {
+    const data = await sqsClient.send(new SendMessageCommand(params));
+    console.log(`Success, message sent to ${params.QueueUrl}. MessageID:`, data.MessageId);
+    return data;
+  } catch (err) {
+    console.log('Error', err);
+  }
 }
 
 module.exports = sendMsgToSQS;

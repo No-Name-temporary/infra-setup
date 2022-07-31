@@ -20,6 +20,7 @@ interface HomeStackProps extends cdk.StackProps {
 
 export class HomeRegionStack extends cdk.Stack {
   public testMsgFanOut: ITopic;
+  public testResultsQName: string;
 
   constructor(scope: Construct, id: string, props: HomeStackProps) {
     super(scope, id, props);
@@ -34,25 +35,16 @@ export class HomeRegionStack extends cdk.Stack {
       retentionPeriod: Duration.minutes(5)
     });
 
+    this.testResultsQName = 'test-result-collector-Q'
+
     // Queue to recieve the SNS message, emptied by `test-runner` in home region
-    const testResultCollectorQ = new sqs.Queue(this, 'test-result-collector-Q', {
+    const testResultCollectorQ = new sqs.Queue(this, this.testResultsQName, {
       visibilityTimeout: Duration.minutes(4),
-      queueName: 'test-result-collector-Q',
+      queueName: this.testResultsQName,
       retentionPeriod: Duration.minutes(5)
     });
 
     testResultCollectorQ.grantSendMessages(new iam.ServicePrincipal('lambda.amazonaws.com'));
-
-    // const ssmGetParamPolicy = new iam.PolicyStatement({
-    //   actions: ['ssm:GetParameter'],
-    //   resources: [`arn:aws:ssm:${HOME_REGION}:${account}:*`],
-    // });
-
-    // testRunnerLambda.role?.attachInlinePolicy(
-    //   new iam.Policy(this, 'ssm-allow-get-param', {
-    //     statements: [ssmGetParamPolicy],
-    //   }),
-    // );
 
     // create SSM parameter to store the Queue URL for test-result-collector-Q
     const resultCollectorQSSMParameter = new ssm.StringParameter(this, 'resultCollectorQUrl', {

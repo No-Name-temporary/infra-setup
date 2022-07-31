@@ -12,6 +12,7 @@ import { ITopic } from 'aws-cdk-lib/aws-sns';
 
 interface RemoteStackProps extends cdk.StackProps {
   testMsgFanOut: ITopic
+  testResultsQName: string
 }
 
 export class RemoteRegionStack extends cdk.Stack {
@@ -56,14 +57,40 @@ export class RemoteRegionStack extends cdk.Stack {
       resources: [`arn:aws:ssm:${HOME_REGION}:${account}:*`],
     });
 
+    const sendToSQSPolicy = new iam.PolicyStatement({
+      actions: ['sqs:SendMessage', 'sqs:GetQueueAttributes', 'sqs:GetQueueUrl'],
+      resources: [`arn:aws:sqs:${HOME_REGION}:${account}:${props.testResultsQName}`],
+    });
+
     testRunnerLambda.role?.attachInlinePolicy(
       new iam.Policy(this, 'ssm-allow-get-param', {
-        statements: [ssmGetParamPolicy],
+        statements: [ssmGetParamPolicy, sendToSQSPolicy],
       }),
     );
 
+    // testResultCollectorQ.addToResourcePolicy(
+    //   new iam.PolicyStatement({
+    //     effect: iam.Effect.ALLOW,
+    //     principals: [new iam.ServicePrincipal('lambda.amazonaws.com')],
+    //     actions: ['sqs:SendMessage', 'sqs:GetQueueAttributes', 'sqs:GetQueueUrl'],
+    //     resources: [`${testResultCollectorQ.queueArn}`],
+    //   }),
+    // );
+
+    // const ssmGetParamPolicy = new iam.PolicyStatement({
+    //   actions: ['ssm:GetParameter'],
+    //   resources: [`arn:aws:ssm:${HOME_REGION}:${account}:*`],
+    // });
+
+    // testRunnerLambda.role?.attachInlinePolicy(
+    //   new iam.Policy(this, 'ssm-allow-get-param', {
+    //     statements: [ssmGetParamPolicy],
+    //   }),
+    // );
+
+
     remoteRcvQ.grantConsumeMessages(testRunnerLambda);
-    
+
     testRunnerLambda.addEventSource(new SqsEventSource(remoteRcvQ, {
       batchSize: 1,
       enabled: true
