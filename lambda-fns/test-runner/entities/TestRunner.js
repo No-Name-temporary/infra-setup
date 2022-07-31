@@ -21,8 +21,12 @@ class TestRunner {
   async run() {
     const response = await this.httpRequest();
     const results = this.testConfiguration.checkAssertions(response);
-
-    return results;
+    return {
+      status: response.status,
+      data: response.data,
+      headers: response.headers,
+      results,
+    };
   }
 
   async httpRequest() {

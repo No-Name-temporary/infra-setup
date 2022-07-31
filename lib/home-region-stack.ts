@@ -6,6 +6,7 @@ import * as sns from 'aws-cdk-lib/aws-sns';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as rds from 'aws-cdk-lib/aws-rds';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import { SqsEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
 import { Duration } from 'aws-cdk-lib';
 import { SqsSubscription } from 'aws-cdk-lib/aws-sns-subscriptions';
@@ -40,8 +41,21 @@ export class HomeRegionStack extends cdk.Stack {
       retentionPeriod: Duration.minutes(5)
     });
 
+    testResultCollectorQ.grantSendMessages(new iam.ServicePrincipal('lambda.amazonaws.com'));
+
+    // const ssmGetParamPolicy = new iam.PolicyStatement({
+    //   actions: ['ssm:GetParameter'],
+    //   resources: [`arn:aws:ssm:${HOME_REGION}:${account}:*`],
+    // });
+
+    // testRunnerLambda.role?.attachInlinePolicy(
+    //   new iam.Policy(this, 'ssm-allow-get-param', {
+    //     statements: [ssmGetParamPolicy],
+    //   }),
+    // );
+
     // create SSM parameter to store the Queue URL for test-result-collector-Q
-    new ssm.StringParameter(this, 'resultCollectorQUrl', {
+    const resultCollectorQSSMParameter = new ssm.StringParameter(this, 'resultCollectorQUrl', {
       parameterName: `resultCollectorQUrl`,
       stringValue: testResultCollectorQ.queueUrl
     })
@@ -50,12 +64,14 @@ export class HomeRegionStack extends cdk.Stack {
       topicName: 'test-msg-fan-out'
     });
 
+    remoteRcvQ.grantSendMessages(new iam.ServicePrincipal('sns.amazonaws.com'));
+
     // Home region queue for test-runner subscribe and only rcv applicable msgs
     this.testMsgFanOut.addSubscription(new SqsSubscription(remoteRcvQ, {
       rawMessageDelivery: false,
       filterPolicy: {
-        locations: sns.SubscriptionFilter.stringFilter({
-          allowlist: [`${homeRegion}`]
+        [`${homeRegion}`]: sns.SubscriptionFilter.stringFilter({
+          allowlist: ['location']
         })
       }
     }));
@@ -69,7 +85,6 @@ export class HomeRegionStack extends cdk.Stack {
       environment: {
         TOPIC_ARN: this.testMsgFanOut.topicArn
       },
-      onSuccess: new cdk.aws_lambda_destinations.SnsDestination(this.testMsgFanOut),
     });
 
     // Generate a Function URL for test-route-packager and grant privileges to tests-crud to invoke
@@ -114,6 +129,13 @@ export class HomeRegionStack extends cdk.Stack {
       code: lambda.Code.fromAsset('lambda-fns/test-result-writer'),
       handler: 'index.handler',
       timeout: cdk.Duration.seconds(20),
+      environment: { 
+        DB_USER: `${process.env.DB_USER}`, 
+        DB_HOST: `${process.env.DB_HOST}`, 
+        DB_NAME: `${process.env.DB_NAME}`, 
+        DB_PW: `${process.env.DB_PW}`, 
+        DB_PORT: `${process.env.DB_PORT}` 
+      }
     });
 
     // SQS for collecting test results, allow Lambda read+delete msgs

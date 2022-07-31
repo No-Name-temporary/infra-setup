@@ -2,7 +2,7 @@ const { SQSClient, SendMessageCommand } = require('@aws-sdk/client-sqs');
 const getSSMParameter = require('./SSMClient');
 
 async function sendMsgToSQS(response) {
-  const sqsClient = new SQSClient({ region: 'us-east-1' });
+  const sqsClient = new SQSClient({ region: process.env.HOME_REGION });
   const resultCollectorQUrl = await getSSMParameter('resultCollectorQUrl');
 
   const params = {
