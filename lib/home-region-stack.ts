@@ -139,5 +139,23 @@ export class HomeRegionStack extends cdk.Stack {
       enabled: true
     }));
 
+    // Lambda to process test results and write them to DB
+    const testAlertLambda = new lambda.Function(this, 'test-alerts', {
+      functionName: 'test-alerts',
+      runtime: lambda.Runtime.NODEJS_16_X,
+      code: lambda.Code.fromAsset('lambda-fns/test-alerts'),
+      handler: 'index.handler',
+      timeout: cdk.Duration.seconds(20),
+      environment: { 
+        DB_USER: `${process.env.DB_USER}`, 
+        DB_HOST: `${process.env.DB_HOST}`, 
+        DB_NAME: `${process.env.DB_NAME}`, 
+        DB_PW: `${process.env.DB_PW}`, 
+        DB_PORT: `${process.env.DB_PORT}` 
+      }
+    });
+
+    testAlertLambda.grantInvoke(testResultWriterLambda);
+
   }
 }
