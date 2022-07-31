@@ -5,20 +5,27 @@ const getTimestamp = require('./entities/timestamp');
 
 exports.handler = async (event) => {
   const body = JSON.parse(event.Records[0].body);
-  const currRegion = process.env.AWS_REGION;
+  const currRegion = event.Records[0].awsRegion;
   const { test } = JSON.parse(body.Message);
-
   console.log(`...starting test runner in ${currRegion}...`);
-  console.log('SHAPE OF TEST ---> ', test);
+  // console.log('SHAPE OF TEST ---> ', test);
 
   const testConfiguration = new TestConfiguration(test);
   const testRunner = new TestRunner(testConfiguration);
 
-  const results = await testRunner.run();
+  const {
+    status, data, headers, results,
+  } = await testRunner.run();
+
+  // console.log('SHAPE OF RESULTS ------>', results);
+
   const response = {
     title: test.title,
     sender: currRegion,
     timestamp: getTimestamp(),
+    responseStatus: status,
+    responseBody: data,
+    responseHeaders: headers,
     results,
   };
 

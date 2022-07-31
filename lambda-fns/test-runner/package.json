@@ -1,5 +1,5 @@
 {
-  "name": "testrunner-california",
+  "name": "test-runner",
   "version": "1.0.0",
   "description": "Contains code and libraries for test runner Lambda",
   "main": "index.js",
@@ -19,8 +19,8 @@
   },
   "homepage": "https://github.com/No-Name-temporary/lambdas#readme",
   "dependencies": {
-    "@aws-sdk/client-sqs": "^3.131.0",
-    "@aws-sdk/client-ssm":"^3.131.0",
+    "@aws-sdk/client-sqs": "3.131.0",
+    "@aws-sdk/client-ssm": "3.131.0",
     "axios": "^0.27.2"
   },
   "devDependencies": {
