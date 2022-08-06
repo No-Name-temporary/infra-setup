@@ -41,6 +41,18 @@ export class ServerApp extends Construct {
     const managedPolicy = iam.ManagedPolicy.fromAwsManagedPolicyName('AWSElasticBeanstalkWebTier')
     this.ebInstanceRole.addManagedPolicy(managedPolicy);
 
+    const allowAllEventBridgePolicy = iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonEventBridgeFullAccess')
+    this.ebInstanceRole.addManagedPolicy(allowAllEventBridgePolicy);
+    
+
+    // this.ebInstanceRole.addToPrincipalPolicy(
+    //   new iam.PolicyStatement({
+    //     effect: iam.Effect.ALLOW,
+    //     actions: ['s3:GetObject'],
+    //     resources: [  `${this.frontendS3Bucket.bucketArn}/*` ],
+    //   }),
+    // );
+
 
     const profileName = `${appName}-InstanceProfile`
     const instanceProfile = new iam.CfnInstanceProfile(this, profileName, {

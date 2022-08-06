@@ -26,7 +26,8 @@ export class HomeRegionStack extends cdk.Stack {
     super(scope, id, props);
   
 
-    const homeRegion = cdk.Stack.of(this).region;
+    const HOME_REGION = cdk.Stack.of(this).region;
+    const { account } = process.env;
 
     // Queue to recieve the SNS message, emptied by `test-runner` in home region
     const remoteRcvQ = new sqs.Queue(this, 'remote-recv-Q', {
@@ -62,7 +63,7 @@ export class HomeRegionStack extends cdk.Stack {
     this.testMsgFanOut.addSubscription(new SqsSubscription(remoteRcvQ, {
       rawMessageDelivery: false,
       filterPolicy: {
-        [`${homeRegion}`]: sns.SubscriptionFilter.stringFilter({
+        [`${HOME_REGION}`]: sns.SubscriptionFilter.stringFilter({
           allowlist: ['location']
         })
       }
@@ -103,7 +104,28 @@ export class HomeRegionStack extends cdk.Stack {
       handler: 'index.handler',
       timeout: cdk.Duration.seconds(20),
       onSuccess: new cdk.aws_lambda_destinations.SqsDestination(testResultCollectorQ),
+      environment: { 
+        HOME_REGION: HOME_REGION,
+      }
     });
+
+    const ssmGetParamPolicy = new iam.PolicyStatement({
+      actions: ['ssm:GetParameter'],
+      resources: [`arn:aws:ssm:${HOME_REGION}:${account}:*`],
+    });
+
+    const sendToSQSPolicy = new iam.PolicyStatement({
+      actions: ['sqs:SendMessage', 'sqs:GetQueueAttributes', 'sqs:GetQueueUrl'],
+      resources: [`arn:aws:sqs:${HOME_REGION}:${account}:${testResultCollectorQ.queueName}`],
+    });
+
+    testRunnerLambda.role?.attachInlinePolicy(
+      new iam.Policy(this, 'ssm-allow-get-param', {
+        statements: [ssmGetParamPolicy, sendToSQSPolicy],
+      }),
+    );
+
+    testResultCollectorQ.grantSendMessages(testRunnerLambda);
 
     // SQS in front of test-runner, allow Lambda read+delete msgs
     remoteRcvQ.grantConsumeMessages(testRunnerLambda);
@@ -115,6 +137,22 @@ export class HomeRegionStack extends cdk.Stack {
     }));
 
     // Lambda to process test results and write them to DB
+    const testAlertLambda = new lambda.Function(this, 'test-alerts', {
+      functionName: 'test-alerts',
+      runtime: lambda.Runtime.NODEJS_16_X,
+      code: lambda.Code.fromAsset('lambda-fns/test-alerts'),
+      handler: 'index.handler',
+      timeout: cdk.Duration.seconds(20),
+      environment: { 
+        DB_USER: `${process.env.DB_USER}`, 
+        DB_HOST: props.pgInstance.dbInstanceEndpointAddress,  
+        DB_NAME: `${process.env.DB_NAME}`, 
+        DB_PW: `${process.env.DB_PW}`, 
+        DB_PORT: `${process.env.DB_PORT}` 
+      }
+    });
+
+    // Lambda to process test results and write them to DB
     const testResultWriterLambda = new lambda.Function(this, 'test-result-writer', {
       functionName: 'test-result-writer',
       runtime: lambda.Runtime.NODEJS_16_X,
@@ -123,12 +161,15 @@ export class HomeRegionStack extends cdk.Stack {
       timeout: cdk.Duration.seconds(20),
       environment: { 
         DB_USER: `${process.env.DB_USER}`, 
-        DB_HOST: `${process.env.DB_HOST}`, 
+        DB_HOST: props.pgInstance.dbInstanceEndpointAddress, 
         DB_NAME: `${process.env.DB_NAME}`, 
         DB_PW: `${process.env.DB_PW}`, 
-        DB_PORT: `${process.env.DB_PORT}` 
+        DB_PORT: `${process.env.DB_PORT}`,
+        TEST_ALERT_LAMBDA_NAME: testAlertLambda.functionName,
       }
     });
+
+    testAlertLambda.grantInvoke(testResultWriterLambda);
 
     // SQS for collecting test results, allow Lambda read+delete msgs
     testResultCollectorQ.grantConsumeMessages(testResultWriterLambda);
