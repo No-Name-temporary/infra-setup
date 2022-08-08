@@ -21,3 +21,11 @@ export const allAWSRegions:string[] = [
   'ap-northeast-2',
   'ap-northeast-3',
 ];
+
+export const sampleAWSRegions:string[] = [
+  'us-east-1',
+  'us-west-1',
+  'ca-central-1',
+  'eu-north-1',
+  'me-south-1',
+];
