@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 import 'dotenv/config';
 import * as cdk from 'aws-cdk-lib';
-import { FrontendStack } from '../lib/frontend-stack';
 import { HomeRegionStack } from '../lib/home-region-stack';
 import { RemoteRegionStack} from '../lib/remote-region-stack';
 import { DatabaseStack } from '../lib/database-stack';
 
 // import { allAWSRegions } from '../constants/aws-configs';
+import { sampleAWSRegions } from '../constants/aws-configs';
 
 const { account, HOME_REGION } =  process.env;
 
@@ -24,20 +24,24 @@ const homeStack = new HomeRegionStack(app, 'HomeRegionStack', {
 
 homeStack.addDependency(database);
 
-const frontendStack = new FrontendStack(app, 'FrontendStack', {
-  env: { account, region: HOME_REGION },
-});
-
-frontendStack.addDependency(homeStack);
 // const remoteRegions = allAWSRegions.filter(region => region !== HOME_REGION);
+const remoteRegions = sampleAWSRegions.filter(region => region !== HOME_REGION);
 
-const remoteStack = new RemoteRegionStack(app, 'RemoteRegionStack', {
-  env: { account, region: 'ca-central-1' }, 
-  testMsgFanOut: homeStack.testMsgFanOut,
-  testResultsQName: homeStack.testResultsQName
+remoteRegions.forEach(region => {
+  new RemoteRegionStack(app, `remote-stack-${region}`, {
+    env: { account, region }, 
+    testMsgFanOut: homeStack.testMsgFanOut,
+    testResultsQName: homeStack.testResultsQName
+  });
 });
 
-remoteStack.addDependency(homeStack);
+// const remoteStack = new RemoteRegionStack(app, 'RemoteRegionStack', {
+//   env: { account, region: 'ca-central-1' }, 
+//   testMsgFanOut: homeStack.testMsgFanOut,
+//   testResultsQName: homeStack.testResultsQName
+// });
+
+// remoteStack.addDependency(homeStack);
 
 // new cdk.CfnOutput(database, 'postgresDbEndpoint', {
 //   value: database.pgInstance.instanceEndpoint.hostname,
