@@ -7,6 +7,7 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as rds from 'aws-cdk-lib/aws-rds';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import { ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { SqsEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
 import { Duration } from 'aws-cdk-lib';
 import { SqsSubscription } from 'aws-cdk-lib/aws-sns-subscriptions';
@@ -78,6 +79,29 @@ export class HomeRegionStack extends cdk.Stack {
       environment: {
         TOPIC_ARN: this.testMsgFanOut.topicArn
       },
+    });
+
+    const allowNewEventBridgeRules = new iam.PolicyStatement({
+      principals: [new ServicePrincipal('events.amazonaws.com')],
+      actions: ['lambda:InvokeFunction'],
+      // resources: [`arn:aws:sqs:${HOME_REGION}:${account}:${props.testResultsQName}`],
+      conditions: {
+        'ArnLike': {
+          'AWS:SourceArn': `arn:aws:events:${HOME_REGION}:${account}:rule/*`,
+        },
+      },
+    });
+
+    testRoutePackagerLambda.addPermission('allow-eventbridge-rule-invoke', {
+      principal: new ServicePrincipal('events.amazonaws.com'),
+      action: 'lambda:InvokeFunction',
+      sourceArn: `arn:aws:events:${HOME_REGION}:${account}:rule/*`
+      // resources: [`arn:aws:sqs:${HOME_REGION}:${account}:${props.testResultsQName}`],
+      // conditions: {
+      //   'ArnLike': {
+      //     'AWS:SourceArn': `arn:aws:events:${HOME_REGION}:${account}:rule/*`,
+      //   },
+      // },
     });
 
     // Generate a Function URL for test-route-packager and grant privileges to tests-crud to invoke

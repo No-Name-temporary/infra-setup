@@ -6,9 +6,5 @@
   },
   "HomeRegionStack": {
     "testscrudtestsCrudEndpointUrlAE5F8964": "awseb-e-q-AWSEBLoa-1P0T6MQSJWMTW-1175063008.us-east-1.elb.amazonaws.com"
-  },
-  "FrontendStack": {
-    "backendServerEndpoint": "awseb-e-q-AWSEBLoa-1P0T6MQSJWMTW-1175063008.us-east-1.elb.amazonaws.com",
-    "frontendWebsiteUrl": "http://seymour-react-temp-frontend-bucket.s3-website-us-east-1.amazonaws.com"
   }
 }
