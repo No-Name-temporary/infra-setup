@@ -9,6 +9,8 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import { Construct } from 'constructs';
 import { IRole } from 'aws-cdk-lib/aws-iam';
 
+const path = require('path');
+
 
 export interface ServerAppProps {
   pgInstance: rds.DatabaseInstance
@@ -30,7 +32,7 @@ export class ServerApp extends Construct {
 
     // Create S3 asset from the ZIP file of the tests-crud app
     const ebZipArchive = new s3assets.Asset(this, 'testsCrudAppZip', {
-      path: '../provision-aws/server/tests-crud.zip',
+      path: path.join(__dirname, '..', 'server', 'tests-crud.zip'),
     });
     
     // Elastic Beanstalk IAM Roles

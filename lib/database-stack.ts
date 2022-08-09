@@ -9,6 +9,8 @@ import { CdkResourceInitializer } from './resource-init-rds';
 // import { DockerImageCode } from 'aws-cdk-lib/aws-lambda';
 import { RetentionDays } from 'aws-cdk-lib/aws-logs';
 
+const path = require('path');
+
 
 export class DatabaseStack extends cdk.Stack {
   public vpc: ec2.Vpc;
@@ -65,7 +67,7 @@ export class DatabaseStack extends cdk.Stack {
     const initializer = new CdkResourceInitializer(this, 'SeymourRdsInit', {
       config: {  password: password.unsafeUnwrap(), host, dbPort, username, dbName },
       fnLogRetention: RetentionDays.ONE_WEEK,
-      fnCode: lambda.Code.fromAsset('lambda-fns/init-rds'),
+      fnCode: lambda.Code.fromAsset(path.join(__dirname, '..', 'lambda-fns', 'init-rds')),
       fnTimeout: Duration.minutes(3),
       fnSecurityGroups: [],
       allowPublicSubnet: true,

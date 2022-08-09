@@ -14,6 +14,8 @@ import { SqsSubscription } from 'aws-cdk-lib/aws-sns-subscriptions';
 import { ITopic } from 'aws-cdk-lib/aws-sns';
 import { ServerApp } from './server-construct';
 
+const path = require('path');
+
 
 interface HomeStackProps extends cdk.StackProps {
   pgInstance: rds.DatabaseInstance
@@ -124,7 +126,7 @@ export class HomeRegionStack extends cdk.Stack {
     const testRunnerLambda = new lambda.Function(this, 'test-runner', {
       functionName: 'test-runner',
       runtime: lambda.Runtime.NODEJS_16_X,
-      code: lambda.Code.fromAsset('lambda-fns/test-runner'),
+      code: lambda.Code.fromAsset(path.join(__dirname, '..', 'lambda-fns', 'test-runner')),
       handler: 'index.handler',
       timeout: cdk.Duration.seconds(20),
       onSuccess: new cdk.aws_lambda_destinations.SqsDestination(testResultCollectorQ),
@@ -164,7 +166,7 @@ export class HomeRegionStack extends cdk.Stack {
     const testAlertLambda = new lambda.Function(this, 'test-alerts', {
       functionName: 'test-alerts',
       runtime: lambda.Runtime.NODEJS_16_X,
-      code: lambda.Code.fromAsset('lambda-fns/test-alerts'),
+      code: lambda.Code.fromAsset(path.join(__dirname, '..', 'lambda-fns', 'test-alerts')),
       handler: 'index.handler',
       timeout: cdk.Duration.seconds(20),
       environment: { 
@@ -180,7 +182,7 @@ export class HomeRegionStack extends cdk.Stack {
     const testResultWriterLambda = new lambda.Function(this, 'test-result-writer', {
       functionName: 'test-result-writer',
       runtime: lambda.Runtime.NODEJS_16_X,
-      code: lambda.Code.fromAsset('lambda-fns/test-result-writer'),
+      code: lambda.Code.fromAsset(path.join(__dirname, '..', 'lambda-fns', 'test-result-writer')),
       handler: 'index.handler',
       timeout: cdk.Duration.seconds(20),
       environment: { 
