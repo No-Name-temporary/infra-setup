@@ -32,13 +32,6 @@ remoteRegions.forEach(region => {
     env: { account, region }, 
     testMsgFanOut: homeStack.testMsgFanOut,
     testResultsQName: homeStack.testResultsQName
-  });
+  })
+  .addDependency(homeStack);
 });
-
-// const remoteStack = new RemoteRegionStack(app, 'RemoteRegionStack', {
-//   env: { account, region: 'ca-central-1' }, 
-//   testMsgFanOut: homeStack.testMsgFanOut,
-//   testResultsQName: homeStack.testResultsQName
-// });
-
-// remoteStack.addDependency(homeStack);
