@@ -42,20 +42,3 @@ remoteRegions.forEach(region => {
 // });
 
 // remoteStack.addDependency(homeStack);
-
-// new cdk.CfnOutput(database, 'postgresDbEndpoint', {
-//   value: database.pgInstance.instanceEndpoint.hostname,
-// });
-
-// new cdk.CfnOutput(homeStack, 'postgresDbEndpoint', {
-//   value: homeStack.env,
-// });
-
-// remoteRegions.forEach(region => {
-//   new RemoteRegionStack(app, 'RemoteRegionStack', 
-//   { env: { account, region }, 
-//     testMsgFanOut: homeStack.testMsgFanOut,
-//     testResultCollectorQ: homeStack.testResultCollectorQ,
-//   });
-// });
-

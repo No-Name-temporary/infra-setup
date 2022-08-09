@@ -12,10 +12,23 @@ following prerequisites.
 
 ## Deployment Steps
 
-1. .env file configuration - In the root folder is an example .env file with dummy values, input all
+1. .env file configuration - In the root folder is an example fake.env file with dummy values, input all
 necessary information. For example your AWS account number, keys, secrets, etc.
 The information for the database can be left alone, but it's probably best
-to change them to your own values.
+to change them to your own values. Lastly, remove `fake` from the file name in order for it to be used.
+
+1B. [OPTIONAL] - In the env file you configured your "home" AWS region in which most of the resources
+  will be deployed. However, by default, all of the other AWS regions*** will be deployed to as remote regions. 
+  If you would like to limit the remote regions, please delete any unneeded regions from the array in the
+  `~/constants/aws-configs.ts` file.
+
+  *** - [Not all AWS regions are 'enabled' by default](https://docs.aws.amazon.com/general/latest/gr/rande-manage.html#:~:text=If%20a%20Region%20is%20disabled%20by%20default%2C%20you%20must%20enable%20it%20before%20you%20can%20create%20and%20manage%20resources.), the following regions must be
+    manually enabled through your console before being able to proceed with the install:
+    - Africa (Cape Town)
+    - Asia Pacific (Hong Kong)
+    - Asia Pacific (Jakarta)
+    - Europe (Milan)
+    - Middle East (Bahrain)
 
 2. `npm install`
 
