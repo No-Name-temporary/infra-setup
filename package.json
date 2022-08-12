@@ -2,7 +2,8 @@
   "name": "provision-aws",
   "version": "0.1.0",
   "bin": {
-    "provision-aws": "bin/provision-aws.js"
+    "provision-aws": "bin/provision-aws.js",
+    "seymour": "bin/cli.js"
   },
   "scripts": {
     "provision": "cdk deploy --all --require-approval never --outputs-file config.json",
@@ -23,6 +24,7 @@
   },
   "dependencies": {
     "aws-cdk-lib": "2.32.1",
+    "commander": "^9.4.0",
     "constructs": "10.0.0",
     "dotenv": "^16.0.1"
   }

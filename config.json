@@ -1,7 +1,10 @@
 {
   "SeymourDB": {
-    "RdsInitFnResponse": "{\"status\":\"OK\",\"results\":\"[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object \"}",
-    "ExportsOutputFnGetAttPostgres9DC8BB04EndpointAddress36F9722A": "sptz335636u0fp.cwfwsjd5clwi.us-east-1.rds.amazonaws.com",
-    "postgresDbEndpoint": "sptz335636u0fp.cwfwsjd5clwi.us-east-1.rds.amazonaws.com"
+    "RdsInitFnResponse": "{\"status\":\"ERROR\",\"err\":{\"length\":112,\"name\":\"error\",\"severity\":\"ERROR\",\"code\":\"42P01\",\"file\":\"tablecmds.c\",\"line\":\"1218\",\"routine\":\"DropErrorMsgNonExistent\"},\"message\":\"table \\\"assertion_results\\\" does not exist\"}",
+    "ExportsOutputFnGetAttPostgres9DC8BB04EndpointAddress36F9722A": "sp5gyimtkyszgq.czxl8u7fk6py.us-west-1.rds.amazonaws.com",
+    "postgresDbEndpoint": "sp5gyimtkyszgq.czxl8u7fk6py.us-west-1.rds.amazonaws.com"
+  },
+  "HomeRegionStack": {
+    "testscrudtestsCrudEndpointUrlAE5F8964": "awseb-e-3-AWSEBLoa-1WD9Z9Y17SUN1-1357676220.us-west-1.elb.amazonaws.com"
   }
 }
