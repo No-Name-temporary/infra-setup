@@ -68,27 +68,6 @@ export class RemoteRegionStack extends cdk.Stack {
       }),
     );
 
-    // testResultCollectorQ.addToResourcePolicy(
-    //   new iam.PolicyStatement({
-    //     effect: iam.Effect.ALLOW,
-    //     principals: [new iam.ServicePrincipal('lambda.amazonaws.com')],
-    //     actions: ['sqs:SendMessage', 'sqs:GetQueueAttributes', 'sqs:GetQueueUrl'],
-    //     resources: [`${testResultCollectorQ.queueArn}`],
-    //   }),
-    // );
-
-    // const ssmGetParamPolicy = new iam.PolicyStatement({
-    //   actions: ['ssm:GetParameter'],
-    //   resources: [`arn:aws:ssm:${HOME_REGION}:${account}:*`],
-    // });
-
-    // testRunnerLambda.role?.attachInlinePolicy(
-    //   new iam.Policy(this, 'ssm-allow-get-param', {
-    //     statements: [ssmGetParamPolicy],
-    //   }),
-    // );
-
-
     remoteRcvQ.grantConsumeMessages(testRunnerLambda);
 
     testRunnerLambda.addEventSource(new SqsEventSource(remoteRcvQ, {

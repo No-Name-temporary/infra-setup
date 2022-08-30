@@ -1,31 +1,8 @@
 # About
-Contains code and libraries for test results writer Lambda
+This respository contains the code for the Test Result Writer lambda function, a component of the Seymour Active Monitoring solution.
 
-# Run locally
-1. `$ npm run locally`
+Test Result Writer receives test results data from [Test Runner](https://github.com/seymour-active-monitoring/test-runner) and writes to the database. For failed tests, Test Result Writer triggers [Test Alerts](https://github.com/seymour-active-monitoring/test-alerts)
 
-For more info: https://stackoverflow.com/questions/52019039/how-to-test-aws-lambda-handler-locally-using-nodejs
+# Deployment
 
-# Upload to AWS
-1. Zip the contents of the root directory: 
-  * `$ cd test-result-writer`
-  * `$ npm run zip`
-2. Upload the .zip file to the AWS Lambda management console
-
-# Expecting Shape of Incoming Test Results Message to be:
-```json
-{
-  "title": "example-working-test",
-  "sender": "us-west-1",
-  "timestamp": "Sat, 16 Jul 2022 13:43:07 GMT",
-  "results": [
-    {
-      "assertionType": "statusCode",
-      "targetValue": "200",
-      "actualValue": 200,
-      "comparisonType": "equal_to",
-      "success": true
-    }
-  ]
-}
-```
+Test Result Writer should be deployed along with the entire Seymour application. Refer to the following repo for detailed deployment instructions: [infra-setup](https://github.com/seymour-active-monitoring/infra-setup)

@@ -1,0 +1,102 @@
+{
+  "status": 200,
+  "statusText": "OK",
+  "headers": {
+     "server": "nginx/1.18.0 (Ubuntu)",
+     "date": "Sun, 31 Jul 2022 19:36:51 GMT",
+     "content-type": "application/json; charset=utf-8",
+     "content-length": "4498",
+     "connection": "close",
+     "x-powered-by": "Express",
+     "access-control-allow-origin": "*",
+     "access-control-allow-headers": "Origin, X-Requested-With, Content-Type, Accept",
+     "etag": "W/\"1192-xnMxHs1/1ieIX+L+RYJDplT6kdk\"",
+     "request-duration": 723
+  },
+  "config": {
+     "headers": {
+        "Accept": "application/json, text/plain, */*",
+        "request-startTime": 1659296210789,
+        "Content-Type": "application/json",
+        "User-Agent": "axios/0.27.2",
+        "Content-Length": 2
+     },
+     "method": "get",
+     "url": "https://trellific.corkboard.dev/api/boards",
+     "data": "{}"
+  },
+  "data": [
+     {
+        "_id": "62e0741897e4e03502e0c796",
+        "title": "end2end-prototype",
+        "createdAt": "2022-07-26T23:09:12.015Z",
+        "updatedAt": "2022-07-26T23:09:12.015Z"
+     },
+     {
+        "_id": "62e0a4df97e4e03502e0c797",
+        "title": "0726-t3 test boar",
+        "createdAt": "2022-07-27T02:37:19.690Z",
+        "updatedAt": "2022-07-27T02:37:19.690Z"
+     },
+     {
+        "_id": "62e0a4e097e4e03502e0c798",
+        "title": "0726-t3 test boar",
+        "createdAt": "2022-07-27T02:37:20.127Z",
+        "updatedAt": "2022-07-27T02:37:20.127Z"
+     },
+     {
+        "_id": "62e0e27197e4e03502e0c799",
+        "title": "new board",
+        "createdAt": "2022-07-27T07:00:01.133Z",
+        "updatedAt": "2022-07-27T07:00:01.133Z"
+     },
+     {
+        "_id": "62e0e27597e4e03502e0c79a",
+        "title": "new board",
+        "createdAt": "2022-07-27T07:00:05.046Z",
+        "updatedAt": "2022-07-27T07:00:05.046Z"
+     },
+     {
+        "_id": "62e1835297e4e03502e0c79b",
+        "title": "0727-t4 board test",
+        "createdAt": "2022-07-27T18:26:26.769Z",
+        "updatedAt": "2022-07-27T18:26:26.769Z"
+     },
+     {
+        "_id": "62e1835397e4e03502e0c79c",
+        "title": "0727-t4 board test",
+        "createdAt": "2022-07-27T18:26:27.421Z",
+        "updatedAt": "2022-07-27T18:26:27.421Z"
+     },
+     {
+        "_id": "62e1838e97e4e03502e0c79d",
+        "title": "0727-t4 board test",
+        "createdAt": "2022-07-27T18:27:26.989Z",
+        "updatedAt": "2022-07-27T18:27:26.989Z"
+     },
+     {
+        "_id": "62e1838f97e4e03502e0c79e",
+        "title": "0727-t4 board test",
+        "createdAt": "2022-07-27T18:27:27.649Z",
+        "updatedAt": "2022-07-27T18:27:27.649Z"
+     },
+     {
+        "_id": "62e183cb97e4e03502e0c79f",
+        "title": "0727-t4 board test",
+        "createdAt": "2022-07-27T18:28:27.041Z",
+        "updatedAt": "2022-07-27T18:28:27.041Z"
+     },
+     {
+        "_id": "62e183cb97e4e03502e0c7a0",
+        "title": "0727-t4 board test",
+        "createdAt": "2022-07-27T18:28:27.678Z",
+        "updatedAt": "2022-07-27T18:28:27.678Z"
+     },
+     {
+        "_id": "62e1840697e4e03502e0c7a1",
+        "title": "0727-t4 board test",
+        "createdAt": "2022-07-27T18:29:26.570Z",
+        "updatedAt": "2022-07-27T18:29:26.570Z"
+     }
+  ]
+}

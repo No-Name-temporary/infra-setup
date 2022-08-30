@@ -18,17 +18,21 @@ The information for the database can be left alone, but it's probably best
 to change them to your own values. Lastly, remove `fake` from the file name in order for it to be used.
 
 1B. [OPTIONAL] - In the env file you configured your "home" AWS region in which most of the resources
-  will be deployed. However, by default, all of the other AWS regions*** will be deployed to as remote regions. 
+  will be deployed. There is currently a "sample" set of remote regions being used in the `~/bin/provision-aws.ts`
+  file. Once satisfied that Seymour is working as you expect, you can comment the 'sample' lines of code.
+  However, by default, all of the other AWS regions*** will be deployed to as remote regions. 
   If you would like to limit the remote regions, please delete any unneeded regions from the array in the
   `~/constants/aws-configs.ts` file.
 
   *** - [Not all AWS regions are 'enabled' by default](https://docs.aws.amazon.com/general/latest/gr/rande-manage.html#:~:text=If%20a%20Region%20is%20disabled%20by%20default%2C%20you%20must%20enable%20it%20before%20you%20can%20create%20and%20manage%20resources.), the following regions must be
-    manually enabled through your console before being able to proceed with the install:
+    manually enabled through your AWS console before being able to deploy to them.
     - Africa (Cape Town)
     - Asia Pacific (Hong Kong)
     - Asia Pacific (Jakarta)
     - Europe (Milan)
     - Middle East (Bahrain)
+  They are currently commented out of the imported `allAWSRegions` variable. Once manually activated in your
+  console, you can uncomment the regions in the `aws-configs.ts` file and run the installation as outlined.
 
 2. `npm install`
 
@@ -45,6 +49,8 @@ initial setups steps to interact with the CLI on your local machine.
 
 Also, the HOME_REGION variable in the env file must be the same as the region
 you have configured for your AWS CLI environment.
+
+4. To remove all deployed resources from your account run `cdk destroy --all`
 
 
 ## Misc commands

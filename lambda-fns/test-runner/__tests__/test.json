@@ -1,0 +1,48 @@
+{
+  "test": {
+    "title": "katarina-01",
+    "locations": [
+      "us-east-1"
+    ],
+    "minutesBetweenRuns": 1,
+    "type": "api",
+    "httpRequest": {
+      "method": "get",
+      "url": "https://trellific.corkboard.dev/api/boards",
+      "headers": {},
+      "body": {},
+      "assertions": [
+        {
+          "type": "responseTime",
+          "property": null,
+          "comparison": "lessThan",
+          "target": "500"
+        },
+        {
+          "type": "statusCode",
+          "property": null,
+          "comparison": "equalTo",
+          "target": "200"
+        },
+        {
+          "type": "header",
+          "property": "access-control-allow-origin",
+          "comparison": "equalTo",
+          "target": "*"
+        },
+        {
+          "type": "body",
+          "property": null,
+          "comparison": "contains",
+          "target": "_id"
+        },
+        {
+          "type": "body",
+          "property": "$[0].title",
+          "comparison": "equalTo",
+          "target": "end2end-prototype"
+        }
+      ]
+    }
+  }
+}

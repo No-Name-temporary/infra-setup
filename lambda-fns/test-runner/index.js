@@ -6,7 +6,7 @@ const getTimestamp = require('./entities/timestamp');
 exports.handler = async (event) => {
   const body = JSON.parse(event.Records[0].body);
   const currRegion = event.Records[0].awsRegion;
-  const homeRegion = process.env.HOME_REGION;
+  const inHomeRegion = process.env.HOME_REGION === currRegion;
   const { test } = JSON.parse(body.Message);
   console.log(`...starting test runner in ${currRegion}...`);
   console.log('SHAPE OF TEST ---> ', test);
@@ -22,6 +22,7 @@ exports.handler = async (event) => {
 
   const response = {
     title: test.title,
+    testId: test.id,
     sender: currRegion,
     timestamp: getTimestamp(),
     responseStatus: status,
@@ -30,8 +31,5 @@ exports.handler = async (event) => {
     results,
   };
 
-  // console.log('currRegion vs homeRegion -->', currRegion, homeRegion)
-  // if (currRegion === homeRegion) return response;
-
-  await sendMsgToSQS(response);
+  await sendMsgToSQS(response, inHomeRegion);
 };

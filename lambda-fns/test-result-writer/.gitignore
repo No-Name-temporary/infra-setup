@@ -1,6 +1,5 @@
-*.d.ts
-!node_modules
-
-# CDK asset staging directory
-.cdk.staging
-cdk.out
+!node_modules/
+*.zip
+.DS_Store
+.env
+.vscode/

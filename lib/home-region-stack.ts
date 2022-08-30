@@ -98,12 +98,6 @@ export class HomeRegionStack extends cdk.Stack {
       principal: new ServicePrincipal('events.amazonaws.com'),
       action: 'lambda:InvokeFunction',
       sourceArn: `arn:aws:events:${HOME_REGION}:${account}:rule/*`
-      // resources: [`arn:aws:sqs:${HOME_REGION}:${account}:${props.testResultsQName}`],
-      // conditions: {
-      //   'ArnLike': {
-      //     'AWS:SourceArn': `arn:aws:events:${HOME_REGION}:${account}:rule/*`,
-      //   },
-      // },
     });
 
     // Generate a Function URL for test-route-packager and grant privileges to tests-crud to invoke
@@ -132,6 +126,7 @@ export class HomeRegionStack extends cdk.Stack {
       onSuccess: new cdk.aws_lambda_destinations.SqsDestination(testResultCollectorQ),
       environment: { 
         HOME_REGION: HOME_REGION,
+        RESULT_Q_URL: testResultCollectorQ.queueUrl,
       }
     });
 

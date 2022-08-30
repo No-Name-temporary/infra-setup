@@ -6,7 +6,6 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import { Duration, Token } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { CdkResourceInitializer } from './resource-init-rds';
-// import { DockerImageCode } from 'aws-cdk-lib/aws-lambda';
 import { RetentionDays } from 'aws-cdk-lib/aws-logs';
 
 const path = require('path');

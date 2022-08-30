@@ -1,17 +1,5 @@
+/* eslint-disable no-param-reassign */
 const axios = require('axios');
-
-axios.interceptors.request.use((config) => {
-  // eslint-disable-next-line no-param-reassign
-  config.headers['request-startTime'] = new Date().getTime();
-  return config;
-});
-
-axios.interceptors.response.use((response) => {
-  const currentTime = new Date().getTime();
-  const startTime = response.config.headers['request-startTime'];
-  response.headers['request-duration'] = currentTime - startTime;
-  return response;
-});
 
 class TestRunner {
   constructor(testConfiguration) {
@@ -30,6 +18,27 @@ class TestRunner {
   }
 
   async httpRequest() {
+    axios.interceptors.request.use((config) => {
+      config.headers['request-startTime'] = new Date().getTime();
+
+      // set user-defined request headers
+      if (this.testConfiguration.headers) {
+        const reqHeaders = this.testConfiguration.headers;
+        Object.keys(reqHeaders).forEach((header) => {
+          config.headers[header] = reqHeaders[header];
+        });
+      }
+
+      return config;
+    });
+
+    axios.interceptors.response.use((response) => {
+      const currentTime = new Date().getTime();
+      const startTime = response.config.headers['request-startTime'];
+      response.headers['request-duration'] = currentTime - startTime;
+      return response;
+    });
+
     let response;
     try {
       response = await axios({
