@@ -1,26 +1,26 @@
-DROP TABLE assertion_results;
+DROP TABLE IF EXISTS assertion_results;
 
-DROP TABLE assertions;
+DROP TABLE IF EXISTS assertions;
 
-DROP TABLE comparison_types;
+DROP TABLE IF EXISTS comparison_types;
 
-DROP TABLE tests_regions;
+DROP TABLE IF EXISTS tests_regions;
 
-DROP TABLE test_runs;
+DROP TABLE IF EXISTS test_runs;
 
-DROP TABLE regions;
+DROP TABLE IF EXISTS regions;
 
-DROP TABLE tests_alerts;
+DROP TABLE IF EXISTS tests_alerts;
 
-DROP TABLE alerts;
+DROP TABLE IF EXISTS alerts;
 
-DROP TABLE notification_settings;
+DROP TABLE IF EXISTS notification_settings;
 
-DROP TABLE tests;
+DROP TABLE IF EXISTS tests;
 
-DROP TABLE http_methods;
+DROP TABLE IF EXISTS http_methods;
 
-DROP TABLE assertion_types;
+DROP TABLE IF EXISTS assertion_types;
 
 CREATE TABLE assertion_types (
   id serial PRIMARY KEY,

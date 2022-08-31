@@ -1,12 +1,15 @@
 {
-  "name": "test-runner",
+  "name": "testrunner-california",
   "version": "1.0.0",
   "description": "Contains code and libraries for test runner Lambda",
   "main": "index.js",
   "scripts": {
-    "locally": "node -e \"console.log(require('./index').handler(require('./event.json')));\"",
+    "locally": "node -e \"console.log(require('./index').handler(require('./event-tests/event.json')));\"",
+    "locally-github": "node -e \"console.log(require('./index').handler(require('./event-tests/event-req-github.json')));\"",
+    "locally-coin": "node -e \"console.log(require('./index').handler(require('./event-tests/event-req-coin-api.json')));\"",
     "zip": "zip -r test-runner-sqs.zip .",
-    "lint": "./node_modules/.bin/eslint ."
+    "lint": "./node_modules/.bin/eslint .",
+    "test": "jest --verbose ./__tests__"
   },
   "repository": {
     "type": "git",
@@ -19,12 +22,13 @@
   },
   "homepage": "https://github.com/No-Name-temporary/lambdas#readme",
   "dependencies": {
-    "@aws-sdk/client-sqs": "3.131.0",
-    "@aws-sdk/client-ssm": "3.131.0",
+    "@aws-sdk/client-sqs": "^3.131.0",
+    "@aws-sdk/client-ssm": "^3.131.0",
     "axios": "^0.27.2"
   },
   "devDependencies": {
     "eslint": "^8.19.0",
-    "eslint-config-airbnb": "^19.0.4"
+    "eslint-config-airbnb": "^19.0.4",
+    "jest": "^28.1.3"
   }
 }

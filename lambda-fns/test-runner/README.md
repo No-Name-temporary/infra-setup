@@ -1,21 +1,10 @@
-# testRunner-\[region\]
+# About
+This respository contains the code for the Test Runner lambda function, a component of the Seymour Active Monitoring solution.
 
-This is the lambda code to be used for each test runner region.
+Test Runner receives test configuration data from [Test Route Packager](https://github.com/seymour-active-monitoring/test-route-packager). Test Runner makes a request to the API endpoint indicated by the test configuration and then compares the respose to the assertions.
 
-# Run locally
-1. `$ cd test-runner-us-west-1`
-2. `$ npm run locally`
+Test Runner communicates results data to the home region for further processing by [Test Result Writer](https://github.com/seymour-active-monitoring/test-result-writer) 
 
-For more info: https://stackoverflow.com/questions/52019039/how-to-test-aws-lambda-handler-locally-using-nodejs
+# Deployment
 
-# Upload to AWS
-1. Zip the contents of the root directory: 
-  * `$ cd test-runner-us-west-1`
-  * `$ npm run zip`
-2. Upload the test-runner.zip file to each region yuo would like in the AWS Lambda management console.
-
-## 
-The replacement property in the package.json file to have the directory name used as the name for the output zip file is:
-```json
-"zip": "zip -r ${PWD##*/}.zip .",`
-```
+Test Runner should be deployed along with the entire Seymour application. Refer to the following repo for detailed deployment instructions: [infra-setup](https://github.com/seymour-active-monitoring/infra-setup)

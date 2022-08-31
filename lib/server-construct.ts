@@ -166,7 +166,7 @@ export class ServerApp extends Construct {
     this.ebApp = env;
 
     // Output the URL endpoint at which to access tests-crud app
-    new cdk.CfnOutput(this, 'testsCrudEndpointUrl', {
+    new cdk.CfnOutput(this, 'SeymourAppDashboardURL', {
       value: env.attrEndpointUrl,
     });
   }
